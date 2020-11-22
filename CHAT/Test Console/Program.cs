@@ -1,4 +1,5 @@
 ﻿using System;
+using Structs_Final_Project;
 
 namespace Test_Console
 {
@@ -6,7 +7,10 @@ namespace Test_Console
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            SDES prueba = new SDES();
+            prueba.KeysGenerator("10001000");
+            Console.WriteLine(prueba.k1 +"," + prueba.k2);
+            Console.Read();
         }
     }
 }

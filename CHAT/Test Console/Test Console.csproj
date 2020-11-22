@@ -6,4 +6,8 @@
     <RootNamespace>Test_Console</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Structs Final Project\Structs Final Project.csproj" />
+  </ItemGroup>
+
 </Project>
