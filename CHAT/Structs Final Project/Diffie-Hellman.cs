@@ -1,18 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Numerics;
-using System.Text;
+﻿using System.Numerics;
 
 namespace Structs_Final_Project
 {
-    class Diffie_Hellman
+    public class Diffie_Hellman
     {
         #region "Public Number" 
         public BigInteger PublicNumberGenerator(int generator, int prime, int priv)
         {
             BigInteger publicNumber = 0;
 
-            if (generator > 0 && prime > 0)
+            if ((generator > 0) && (prime > 0))
             {
                 if (IsPrimeNumber(prime))
                 {
