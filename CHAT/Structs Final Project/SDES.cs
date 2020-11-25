@@ -86,7 +86,7 @@ namespace Structs_Final_Project
 
             for (int i = 0; i < originalText.Length; i++)
             {
-                #region "Star part one"
+                #region "Start part one"
                 string actualByte = Fill(ConvertDecimalToBinary(originalText[i]), 8);
 
                 string IP = "";

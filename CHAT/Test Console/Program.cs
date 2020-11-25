@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Structs_Final_Project;
 
 namespace Test_Console
@@ -10,7 +9,7 @@ namespace Test_Console
         {           
             SDES _SDES = new SDES();
             _SDES.KeysGenerator("10001000");
-            byte[] textoOriginal = { 23, 84, 14, 199, 200};
+            byte[] textoOriginal = { 23, 84, 14, 199, 200, 80, 88, 99, 40, 40, 41, 24, 42, 3};
             byte[] textoCifrado = _SDES.SDES_Encryption(textoOriginal, "cifrado");
             byte[] textoDescifrado = _SDES.SDES_Encryption(textoCifrado, "descifrado");
             Console.ReadLine();

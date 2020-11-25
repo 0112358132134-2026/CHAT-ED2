@@ -1,0 +1,46 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<br>
+<br />
+
+<font color="white">
+    <div class="text-center">
+
+        <h1 class="display-4">Welcome to "Mlook - Social"</h1>
+
+        <form asp-action="Login">
+
+            <h4>Username</h4>
+            <input type="text" class="text-center" placeholder="Enter your username..." name="userName" />
+
+            <br>
+            <br />
+
+            <h4>Password</h4>
+            <input type="text" class="text-center" placeholder="Enter your password..." name="password" />
+
+            <br><br />
+            <div class="form-group">
+                <input type="submit" value="Login" class="btn btn-success" />
+            </div>
+
+        </form>
+
+        <form asp-action="Register">
+            <div class="form-group">
+                <input type="submit" value="Register" class="btn btn-info" />
+            </div>
+        </form>
+
+    </div>
+</font>
+
+<style>
+    #letras {
+        font: 20px "Acme",message-box, serif;
+    }
+</style>
+
+<body background="https://i.pinimg.com/originals/8a/40/35/8a4035f99ecf3ce8f254caa8aabed4d9.jpg"></body>
