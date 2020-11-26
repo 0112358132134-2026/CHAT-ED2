@@ -57,22 +57,23 @@
         <td>
             <div style="width:1200px; height:450px; overflow:auto;">
                 <table class="table" cellspacing="0" cellpadding="1" border="1" width="1200">
+                    <tbody style="background-color: wheat">
 
-                    @foreach (Message item in ViewBag.actualMessages)
-                    {
+                        @foreach (Message item in ViewBag.actualMessages)
+                        {
 
-                        <tr>
-                            <td>
-                                <h6>@item.emisor</h6>
-                            </td>
-                            <td>
-                                <h6>@item.message</h6>
-                            </td>
-                            <td>
-                                <h6>@item.date</h6>
-                            </td>
-                        </tr>
-                    }
+                            <tr>
+                                <td>
+                                    <h6>@item.emisor</h6>
+                                </td>
+                                <td>
+                                    <h6>@item.message</h6>
+                                </td>
+                                <td>
+                                    <h6>@item.date</h6>
+                                </td>
+                            </tr>
+                        }
 
                 </table>
             </div>
@@ -80,11 +81,6 @@
     </tr>
 </table>
 
-
-
-@*<body background="https://i.ibb.co/crTyn9M/Mensajer-a.jpg">
-</body>*@
-=======
 <body background="https://i.ibb.co/K09qBKR/Mensajes.jpg">
 </body>
->>>>>>> 0047270c823f4d7494c17d8ac173003a98bab8b2
+
