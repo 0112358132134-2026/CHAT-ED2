@@ -17,6 +17,85 @@ namespace API.Controllers
     public class WeatherForecastController : ControllerBase
     {
         [HttpPost]
+        [Route("privateNumberValidation")]
+        public IActionResult nValidation(User user)
+        {
+            if (!ModelState.IsValid)
+                return NotFound();
+
+            MongoClient newClient = new MongoClient("mongodb://localhost:27017");
+            var db = newClient.GetDatabase("chat");
+            var collection = db.GetCollection<BsonDocument>("users");
+            var filter = Builders<BsonDocument>.Filter.Eq("Private_Number", user.Private_Number);
+            var result = collection.Find(filter).FirstOrDefault();
+
+            if (result != null)
+            {
+                User userAux = BsonSerializer.Deserialize<User>(result);
+                var json = JsonSerializer.Serialize(userAux);
+                return Ok(json);
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+
+        [HttpGet]
+        [Route("allUsers")]
+        public IActionResult allUsers()
+        {
+            MongoClient newClient = new MongoClient("mongodb://localhost:27017");
+            var db = newClient.GetDatabase("chat");
+            var collection = db.GetCollection<BsonDocument>("users");
+            var document = collection.Find(new BsonDocument()).ToList();
+
+            if (document.Count != 0)
+            {
+                User[] array = new User[document.Count];
+                int i = 0;
+                foreach (BsonDocument item in document)
+                {
+                    array[i] = BsonSerializer.Deserialize<User>(item);
+                    i++;
+                }
+                var json = JsonSerializer.Serialize(array);
+                return Ok(json);
+            }
+            else
+            {
+                return NotFound();
+            }            
+        }
+
+        [HttpGet]
+        [Route("allMessages")]
+        public IActionResult allMessages()
+        {
+            MongoClient newClient = new MongoClient("mongodb://localhost:27017");
+            var db = newClient.GetDatabase("chat");
+            var collection = db.GetCollection<BsonDocument>("messages");
+            var document = collection.Find(new BsonDocument()).ToList();
+
+            if (document.Count != 0)
+            {
+                Message[] array = new Message[document.Count];
+                int i = 0;
+                foreach (BsonDocument item in document)
+                {
+                    array[i] = BsonSerializer.Deserialize<Message>(item);
+                    i++;
+                }
+                var json = JsonSerializer.Serialize(array);
+                return Ok(json);
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+
+        [HttpPost]
         [Route("userValidation")]
         public IActionResult userV(User user)
         {
@@ -51,8 +130,23 @@ namespace API.Controllers
             MongoClient newClient = new MongoClient("mongodb://localhost:27017");
             var db = newClient.GetDatabase("chat");
             var collection = db.GetCollection<BsonDocument>("users");
-            var user = new BsonDocument {{ "_id", newUser._id }, { "UserName", newUser.UserName }, {"Password", newUser.Password}};
+            var user = new BsonDocument { { "_id", newUser._id }, { "UserName", newUser.UserName }, { "Password", newUser.Password }, { "Private_Number", newUser.Private_Number } };
             collection.InsertOne(user);
+            return Ok();
+        }
+
+        [HttpPost]
+        [Route("addMessage")]
+        public IActionResult addMessage(Message newMessage)
+        {
+            if (!ModelState.IsValid)
+                return NotFound();
+
+            MongoClient newClient = new MongoClient("mongodb://localhost:27017");
+            var db = newClient.GetDatabase("chat");
+            var collection = db.GetCollection<BsonDocument>("messages");
+            var message = new BsonDocument { { "_id", newMessage._id }, { "emisor", newMessage.emisor }, { "receptor", newMessage.receptor }, { "message", newMessage.message }, { "date", newMessage.date} };
+            collection.InsertOne(message);
             return Ok();
         }
     }

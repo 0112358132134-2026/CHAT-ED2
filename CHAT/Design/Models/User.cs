@@ -11,6 +11,8 @@ namespace Design.Models
         [Required(ErrorMessage = "Please enter a password")]
         [StringLength(15)]
         public string Password { get; set; }
+            
+        public int Private_Number { get; set; }
 
         public string _id { get; set; }
         public List<Chat> chats { get; set; }

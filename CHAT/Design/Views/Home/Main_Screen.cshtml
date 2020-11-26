@@ -1,5 +1,6 @@
 ﻿@using System.Text.Json;
 @using Microsoft.AspNetCore.Http;
+@using Design.Models;
 @{
     ViewData["Title"] = "Main_Screen";
     User user = JsonSerializer.Deserialize<User>(Context.Session.GetString("thisUser"));
@@ -9,8 +10,76 @@
 <br />
 
 <div class="text-center">
-    <h4>Hola, @user.UserName esta es nuestra aplicación </h4>
+    <h4>Hello, @user.UserName, you are in your private chat </h4>
 </div>
+
+
+<div class="text-center">
+
+    <form asp-action="SendMessage" asp-controller="User">
+
+        <div class="form-group">
+            <select name="ListUsers" class="form-control">
+
+                @foreach (var item in ViewBag.AllUsers)
+                {
+                    <option value="@item">@item</option>
+                }
+            </select>
+        </div>
+
+        <br>
+        <br />
+
+        <h6>
+            <input type="text" name="Message" placeholder="Write a message..." />
+            <input type="submit" value="Send Message" class="btn btn-success" />
+        </h6>
+
+    </form>
+
+</div>
+
+<table align="center" cellspacing="0" cellpadding="0" border="0" width="1200">
+    <tr>
+        <td>
+            <table cellspacing="0" cellpadding="1" border="1" width="1200">
+                <tr style="color:white;background-color:#EF7708">
+                    <th>Emisor</th>
+                    <th>Message</th>
+                    <th>Date</th>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <div style="width:1200px; height:450px; overflow:auto;">
+                <table class="table" cellspacing="0" cellpadding="1" border="1" width="1200">
+
+                    @foreach (Message item in ViewBag.actualMessages)
+                    {
+
+                        <tr>
+                            <td>
+                                <h6>@item.emisor</h6>
+                            </td>
+                            <td>
+                                <h6>@item.message</h6>
+                            </td>
+                            <td>
+                                <h6>@item.date</h6>
+                            </td>
+                        </tr>
+                    }
+
+                </table>
+            </div>
+        </td>
+    </tr>
+</table>
+
+
 
 <body background="https://i.ibb.co/crTyn9M/Mensajer-a.jpg">
 </body>

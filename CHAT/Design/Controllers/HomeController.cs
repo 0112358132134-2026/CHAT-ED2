@@ -23,12 +23,7 @@ namespace Design.Controllers
             return View();
         }
 
-        public ActionResult Login()
-        {
-            return View("Main_Screen");
-        }
-
-        public ActionResult Register()
+        public IActionResult Register()
         {
             return View("Create_Account");
         }
