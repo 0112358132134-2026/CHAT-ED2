@@ -13,8 +13,6 @@
     <h4>Hello, @user.UserName, you are in your private chat </h4>
 </div>
 
-<<<<<<< HEAD
-
 <div class="text-center">
 
     <form asp-action="SendMessage" asp-controller="User">
@@ -34,52 +32,14 @@
 
         <h6>
             <input type="text" name="Message" placeholder="Write a message..." />
-            <input type="submit" value="Send Message" class="btn btn-success" />
+            <input type="image" value="Send Message" src="~/Imágenes/Flecha.png" class="btn-outline-success " />
         </h6>
 
     </form>
 
 </div>
 
-<table align="center" cellspacing="0" cellpadding="0" border="0" width="1200">
-    <tr>
-        <td>
-            <table cellspacing="0" cellpadding="1" border="1" width="1200">
-                <tr style="color:white;background-color:#EF7708">
-                    <th>Emisor</th>
-                    <th>Message</th>
-                    <th>Date</th>
-                </tr>
-            </table>
-        </td>
-    </tr>
-    <tr>
-        <td>
-            <div style="width:1200px; height:450px; overflow:auto;">
-                <table class="table" cellspacing="0" cellpadding="1" border="1" width="1200">
-                    <tbody style="background-color: wheat">
-
-                        @foreach (Message item in ViewBag.actualMessages)
-                        {
-
-                            <tr>
-                                <td>
-                                    <h6>@item.emisor</h6>
-                                </td>
-                                <td>
-                                    <h6>@item.message</h6>
-                                </td>
-                                <td>
-                                    <h6>@item.date</h6>
-                                </td>
-                            </tr>
-                        }
-
-                </table>
-            </div>
-        </td>
-    </tr>
-</table>
+<input type="image" value="Send Message" src="~/Imágenes/Flecha.png" class="btn-outline-warning " />
 
 <body background="https://i.ibb.co/K09qBKR/Mensajes.jpg">
 </body>
