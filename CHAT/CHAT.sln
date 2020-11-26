@@ -7,7 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Structs Final Project", "St
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test Console", "Test Console\Test Console.csproj", "{E61AE4E2-8D8F-45E0-862B-17CE5C6A86C9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Design", "Design\Design.csproj", "{BF33EC24-0A20-4058-9A30-4935AF99A183}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Design", "Design\Design.csproj", "{BF33EC24-0A20-4058-9A30-4935AF99A183}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API", "API\API.csproj", "{2CD34763-C80B-4968-8274-EDCF01113577}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{BF33EC24-0A20-4058-9A30-4935AF99A183}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BF33EC24-0A20-4058-9A30-4935AF99A183}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BF33EC24-0A20-4058-9A30-4935AF99A183}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2CD34763-C80B-4968-8274-EDCF01113577}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2CD34763-C80B-4968-8274-EDCF01113577}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2CD34763-C80B-4968-8274-EDCF01113577}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2CD34763-C80B-4968-8274-EDCF01113577}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

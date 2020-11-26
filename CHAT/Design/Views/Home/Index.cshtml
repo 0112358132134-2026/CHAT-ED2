@@ -10,7 +10,7 @@
 
         <h1 class="display-4">Welcome to "Mlook - Social"</h1>
 
-        <form asp-action="Login">
+        <form asp-action="Login" asp-controller="User">
 
             <h4>Username</h4>
             <input type="text" class="text-center" placeholder="Enter your username..." name="userName" maxlength="15" />
@@ -19,13 +19,13 @@
             <br />
 
             <h4>Password</h4>
-            <input type="password" class="text-center" placeholder="Enter your password..." name="password" maxlength="15"/>
+            <input type="password" class="text-center" placeholder="Enter your password..." name="password" maxlength="15" />
 
             <br><br />
             <div class="form-group">
                 <input type="submit" value="Login" class="btn btn-success" />
             </div>
-                
+
         </form>
 
         <form asp-action="Register">
@@ -33,6 +33,10 @@
                 <input type="submit" value="Register" class="btn btn-warning" />
             </div>
         </form>
+
+        <font color="red">
+            <h6>@ViewBag.UserNotFound</h6>
+        </font>
 
     </div>
 </font>

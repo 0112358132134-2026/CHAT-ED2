@@ -1,12 +1,15 @@
-﻿@{
+﻿@using System.Text.Json;
+@using Microsoft.AspNetCore.Http;
+@{
     ViewData["Title"] = "Main_Screen";
+    User user = JsonSerializer.Deserialize<User>(Context.Session.GetString("thisUser"));
 }
 
 <br>
 <br />
 
 <div class="text-center">
-    <h4>Hola, esta es nuestra aplicación</h4>
+    <h4>Hola, @user.UserName esta es nuestra aplicación </h4>
 </div>
 
 <body background="https://i.ibb.co/K09qBKR/Mensajes.jpg">
