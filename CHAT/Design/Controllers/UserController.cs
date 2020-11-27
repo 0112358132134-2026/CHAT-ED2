@@ -203,7 +203,8 @@ namespace Design.Controllers
             newMessage.receptor = form["ListUsers"];
             newMessage.message = form["Message"];
             newMessage._id = Guid.NewGuid().ToString();
-            newMessage.date = DateTime.;
+            newMessage.date = DateTime.Now;
+            TimeZoneInfo.ConvertTimeBySystemTimeZoneId(newMessage.date, "Central Standard Time");
             newMessage.type = "message";
 
             if ((newMessage.message != "") && (newMessage.receptor != ""))
