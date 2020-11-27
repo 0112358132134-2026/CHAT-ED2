@@ -145,9 +145,77 @@ namespace API.Controllers
             MongoClient newClient = new MongoClient("mongodb://localhost:27017");
             var db = newClient.GetDatabase("chat");
             var collection = db.GetCollection<BsonDocument>("messages");
-            var message = new BsonDocument { { "_id", newMessage._id }, { "emisor", newMessage.emisor }, { "receptor", newMessage.receptor }, { "message", newMessage.message }, { "date", newMessage.date} };
+            var message = new BsonDocument { { "_id", newMessage._id }, { "emisor", newMessage.emisor }, { "receptor", newMessage.receptor }, { "message", newMessage.message }, { "date", newMessage.date }, { "type", newMessage.type } };
             collection.InsertOne(message);
             return Ok();
+        }
+
+        [HttpPost]
+        [Route("addArchive")]
+        public IActionResult addArchive(Archive archive)
+        {
+            if (!ModelState.IsValid)
+                return NotFound();
+
+            MongoClient newClient = new MongoClient("mongodb://localhost:27017");
+            var db = newClient.GetDatabase("chat");
+            var collection = db.GetCollection<BsonDocument>("records");
+            var message = new BsonDocument { { "_id", archive._id }, { "message", archive.message }};
+            collection.InsertOne(message);
+            return Ok();
+        }
+
+        [HttpPost]
+        [Route("downloadFile")]
+        public IActionResult downloadFile(Archive archive)
+        {
+            if (!ModelState.IsValid)
+                return NotFound();
+
+            MongoClient newClient = new MongoClient("mongodb://localhost:27017");
+            var db = newClient.GetDatabase("chat");
+            var collection = db.GetCollection<BsonDocument>("records");
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", archive._id);
+            var result = collection.Find(filter).FirstOrDefault();
+
+            if (result != null)
+            {
+                Archive archiveAux = BsonSerializer.Deserialize<Archive>(result);
+                var json = JsonSerializer.Serialize(archiveAux);
+                return Ok(json);
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+
+        [HttpPost]
+        [Route("searchMessages")]
+        public IActionResult searchMessages(Message messageAux)
+        {
+            MongoClient newClient = new MongoClient("mongodb://localhost:27017");
+            var db = newClient.GetDatabase("chat");
+            var collection = db.GetCollection<BsonDocument>("messages");
+            var filter = Builders<BsonDocument>.Filter.Eq("message", messageAux.message);
+            var document = collection.Find(filter).ToList();
+
+            if (document.Count != 0)
+            {
+                Message[] array = new Message[document.Count];
+                int i = 0;
+                foreach (BsonDocument item in document)
+                {
+                    array[i] = BsonSerializer.Deserialize<Message>(item);
+                    i++;
+                }
+                var json = JsonSerializer.Serialize(array);
+                return Ok(json);
+            }
+            else
+            {
+                return NotFound();
+            }
         }
     }
 }

@@ -9,5 +9,6 @@ namespace Design.Models
         public string receptor { get; set; }
         public string message { get; set; }
         public DateTime date { get; set; }
+        public string type { get; set; }
     }
 }

@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Design.Models;
+using MongoDB.Driver;
+using MongoDB.Bson;
+using Microsoft.AspNetCore.Http;
 
 namespace Design.Controllers
 {
@@ -16,7 +19,7 @@ namespace Design.Controllers
         public HomeController(ILogger<HomeController> logger)
         {
             _logger = logger;
-        }
+        }      
 
         public IActionResult Index()
         {

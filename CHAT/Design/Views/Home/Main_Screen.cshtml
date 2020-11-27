@@ -8,12 +8,17 @@
 
 <br>
 <br />
+<br>
+<br />
+<br>
+<br />
+<br>
+<br />
 
 <div class="text-center">
     <h4>Hello, @user.UserName, you are in your private chat </h4>
 </div>
 
-<<<<<<< HEAD
 
 <div class="text-center">
 
@@ -22,10 +27,14 @@
         <div class="form-group">
             <select name="ListUsers" class="form-control">
 
-                @foreach (var item in ViewBag.AllUsers)
+                @if (ViewBag.AllUsers != null)
                 {
-                    <option value="@item">@item</option>
+                    foreach (var item in ViewBag.AllUsers)
+                    {
+                        <option value="@item">@item</option>
+                    }
                 }
+
             </select>
         </div>
 
@@ -44,9 +53,10 @@
 <table align="center" cellspacing="0" cellpadding="0" border="0" width="1200">
     <tr>
         <td>
-            <table cellspacing="0" cellpadding="1" border="1" width="1200">
+            <table align="center" cellspacing="0" cellpadding="1" border="1" width="1200">
                 <tr style="color:white;background-color:#EF7708">
                     <th>Emisor</th>
+                    <th>Receptor</th>
                     <th>Message</th>
                     <th>Date</th>
                 </tr>
@@ -56,22 +66,39 @@
     <tr>
         <td>
             <div style="width:1200px; height:450px; overflow:auto;">
-                <table class="table" cellspacing="0" cellpadding="1" border="1" width="1200">
+                <table align="center" class="table" cellspacing="0" cellpadding="1" border="1" width="1200">
 
-                    @foreach (Message item in ViewBag.actualMessages)
+                    @if (ViewBag.actualMessages != null)
                     {
+                        foreach (Message item in ViewBag.actualMessages)
+                        {
 
-                        <tr>
-                            <td>
-                                <h6>@item.emisor</h6>
-                            </td>
-                            <td>
-                                <h6>@item.message</h6>
-                            </td>
-                            <td>
-                                <h6>@item.date</h6>
-                            </td>
-                        </tr>
+                            <tr>
+                                <td>
+                                    <h6>@item.emisor</h6>
+                                </td>
+
+                                <td>
+                                    <h6>@item.receptor</h6>
+                                </td>
+
+                                @if (item.type == "archive")
+                                {
+                                    <td>
+                                        @Html.ActionLink(item.message, "DownloadFile", new { id = item._id })
+                                    </td>
+                                }
+                                else if (item.type == "message")
+                                {
+                                    <td>
+                                        <h6>@item.message</h6>
+                                    </td>
+                                }
+                                <td>
+                                    <h6>@item.date</h6>
+                                </td>
+                            </tr>
+                        }
                     }
 
                 </table>
@@ -80,11 +107,38 @@
     </tr>
 </table>
 
+<div class="text-center">
 
+    <form asp-action="SearchMessages" asp-controller="User">
 
-@*<body background="https://i.ibb.co/crTyn9M/Mensajer-a.jpg">
-</body>*@
-=======
+        <h6>
+            <input type="text" name="receptor" placeholder="User..." />
+            <input type="text" name="MessageToSearch" placeholder="Write something..." />
+            <input type="submit" value="Search Message" class="btn btn-info" />
+        </h6>
+
+    </form>
+
+</div>
+
+<br>
+<br />
+
+<div class="text-center">
+    <form method="post" enctype="multipart/form-data" asp-controller="User" asp-action="Archive">
+
+        <div class="form-group">
+            <table>
+                <tr>
+                    <td><input type="text" name="receptor" placeholder="User..." /></td>
+                    <td></td>
+                    <td><input type="file" name="file" /><input type="submit" value="Add File" class="btn btn-primary" /></td>
+                </tr>
+            </table>
+        </div>
+
+    </form>
+</div>
+
 <body background="https://i.ibb.co/K09qBKR/Mensajes.jpg">
 </body>
->>>>>>> 0047270c823f4d7494c17d8ac173003a98bab8b2
