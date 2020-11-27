@@ -203,7 +203,7 @@ namespace Design.Controllers
             newMessage.receptor = form["ListUsers"];
             newMessage.message = form["Message"];
             newMessage._id = Guid.NewGuid().ToString();
-            newMessage.date = DateTime.Now;
+            newMessage.date = DateTime.;
             newMessage.type = "message";
 
             if ((newMessage.message != "") && (newMessage.receptor != ""))
