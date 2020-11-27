@@ -19,10 +19,7 @@
     <h4>Hello, @user.UserName, you are in your private chat </h4>
 </div>
 
-<<<<<<< HEAD
 
-=======
->>>>>>> 8f6d6e28a92a29e98370d9c902118bbe1b9837a5
 <div class="text-center">
 
     <form asp-action="SendMessage" asp-controller="User">
@@ -45,7 +42,7 @@
         <br />
 
         <h6>
-            <input type="text" name="Message" placeholder="Write a message..." />
+            <input type="text" name="Message" placeholder="Write a message..."/>
             <input type="image" value="Send Message" src="~/Imágenes/Flecha.png" class="btn-outline-success " />
         </h6>
 
@@ -53,14 +50,12 @@
 
 </div>
 
-<<<<<<< HEAD
 <table align="center" cellspacing="0" cellpadding="0" border="0" width="1200">
     <tr>
         <td>
             <table align="center" cellspacing="0" cellpadding="1" border="1" width="1200">
                 <tr style="color:white;background-color:#EF7708">
                     <th>Emisor</th>
-                    <th>Receptor</th>
                     <th>Message</th>
                     <th>Date</th>
                 </tr>
@@ -69,7 +64,7 @@
     </tr>
     <tr>
         <td>
-            <div style="width:1200px; height:450px; overflow:auto;">
+            <div style="width:1200px; height:250px; overflow:auto;">
                 <table align="center" class="table" cellspacing="0" cellpadding="1" border="1" width="1200">
 
                     @if (ViewBag.actualMessages != null)
@@ -81,11 +76,6 @@
                                 <td>
                                     <h6>@item.emisor</h6>
                                 </td>
-
-                                <td>
-                                    <h6>@item.receptor</h6>
-                                </td>
-
                                 @if (item.type == "archive")
                                 {
                                     <td>
@@ -112,24 +102,14 @@
 </table>
 
 <div class="text-center">
+     <form asp-action="SearchMessages" asp-controller="User">
 
-    <form asp-action="SearchMessages" asp-controller="User">
-=======
-<input type="image" value="Send Message" src="~/Imágenes/Flecha.png" class="btn-outline-warning "/>
-
-<body style="        font-family: 'Eras ITC';
-        background-image: url('../Imágenes/Mensajes.jpg');">
-</body>
->>>>>>> 8f6d6e28a92a29e98370d9c902118bbe1b9837a5
-
-        <h6>
-            <input type="text" name="receptor" placeholder="User..." />
-            <input type="text" name="MessageToSearch" placeholder="Write something..." />
-            <input type="submit" value="Search Message" class="btn btn-info" />
-        </h6>
-
-    </form>
-
+            <h6>
+                <input type="text" name="receptor" placeholder="User..." />
+                <input type="text" name="MessageToSearch" placeholder="Write something..." />
+                <input type="submit" value="Search Message" class="btn btn-info" />
+            </h6>
+        </form>
 </div>
 
 <br>
@@ -151,8 +131,6 @@
     </form>
 </div>
 
-<<<<<<< HEAD
-<body background="https://i.ibb.co/K09qBKR/Mensajes.jpg">
+<body style="        font-family: 'Eras ITC';
+        background-image: url('../Imágenes/Mensajes.jpg');">
 </body>
-=======
->>>>>>> 8f6d6e28a92a29e98370d9c902118bbe1b9837a5
