@@ -9,7 +9,6 @@ using System.Text.Json;
 using Structs_Final_Project_1;
 using System.IO;
 using System.Numerics;
-using System.Text;
 using Microsoft.AspNetCore.Hosting;
 
 namespace Design.Controllers
@@ -189,13 +188,13 @@ namespace Design.Controllers
                     }
                     else
                     {
-                        ViewBag.UserNotFound = "Incorrect password!";
+                        ViewBag.UserNotFound = "Incorrect password / user!";
                         return View("../Home/Index");
                     }
                 }
                 else
                 {
-                    ViewBag.UserNotFound = "This user does not exist!";
+                    ViewBag.UserNotFound = "Incorrect password / user!";
                     return View("../Home/Index");
                 }
             }
@@ -219,8 +218,7 @@ namespace Design.Controllers
             newMessage.receptor = form["ListUsers"];
             newMessage.message = form["Message"];
             newMessage._id = Guid.NewGuid().ToString();
-            newMessage.date = DateTime.Today;
-            TimeZoneInfo.ConvertTimeBySystemTimeZoneId(newMessage.date, "Central Standard Time");
+            newMessage.date = DateTime.Now;
             newMessage.type = "message";
 
             if ((newMessage.message != "") && (newMessage.receptor != ""))
@@ -590,6 +588,8 @@ namespace Design.Controllers
 
                     var postTaskAux = client.PostAsJsonAsync<Archive>("addArchive", archive);
                     postTaskAux.Wait();                    
+
+                    //HERE
 
                     var postTask2 = client.GetAsync("allMessages");
                     postTask2.Wait();
