@@ -3,13 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30413.136
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Structs Final Project", "Structs Final Project\Structs Final Project.csproj", "{0C12E85D-58C9-428D-BA8B-442078089B98}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test Console", "Test Console\Test Console.csproj", "{E61AE4E2-8D8F-45E0-862B-17CE5C6A86C9}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Design", "Design\Design.csproj", "{BF33EC24-0A20-4058-9A30-4935AF99A183}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API", "API\API.csproj", "{2CD34763-C80B-4968-8274-EDCF01113577}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "API", "API\API.csproj", "{2CD34763-C80B-4968-8274-EDCF01113577}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +15,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{0C12E85D-58C9-428D-BA8B-442078089B98}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0C12E85D-58C9-428D-BA8B-442078089B98}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0C12E85D-58C9-428D-BA8B-442078089B98}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0C12E85D-58C9-428D-BA8B-442078089B98}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E61AE4E2-8D8F-45E0-862B-17CE5C6A86C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E61AE4E2-8D8F-45E0-862B-17CE5C6A86C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E61AE4E2-8D8F-45E0-862B-17CE5C6A86C9}.Release|Any CPU.ActiveCfg = Release|Any CPU

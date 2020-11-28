@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Text;
-using Structs_Final_Project;
+using Structs_Final_Project_1;
 
 namespace Test_Console
 {

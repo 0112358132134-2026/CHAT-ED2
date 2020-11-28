@@ -12,7 +12,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Structs Final Project\Structs Final Project.csproj" />
+    <Reference Include="Structs Final Project 1">
+      <HintPath>..\..\..\..\..\..\Desktop\Structs Final Project 1\bin\Debug\netcoreapp3.1\Structs Final Project 1.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

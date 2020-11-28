@@ -6,7 +6,7 @@ using Design.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
-using Structs_Final_Project;
+using Structs_Final_Project_1;
 using System.IO;
 using System.Numerics;
 using System.Text;
@@ -134,6 +134,7 @@ namespace Design.Controllers
                 }
             }
         }
+
         [HttpPost]
         public async Task<ActionResult> Login(IFormCollection form)
         {
@@ -200,7 +201,6 @@ namespace Design.Controllers
             }
         }
 
-        //Listo creo
         [HttpPost]
         public async Task<ActionResult> SendMessage(IFormCollection form)
         {
@@ -537,7 +537,6 @@ namespace Design.Controllers
             return Ok();
         }
 
-        //Listo creo (falta LZW)
         [HttpPost]
         public async Task<ActionResult> Archive(IFormFile file, IFormCollection form)
         {
@@ -713,7 +712,6 @@ namespace Design.Controllers
             return StatusCode(500);
         }
 
-        //Falta LZW
         [HttpGet]
         public async Task<ActionResult> DownloadFile(string id)
         {
