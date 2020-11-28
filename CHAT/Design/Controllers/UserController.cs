@@ -221,7 +221,6 @@ namespace Design.Controllers
             newMessage._id = Guid.NewGuid().ToString();
             newMessage.date = DateTime.Today;
             TimeZoneInfo.ConvertTimeBySystemTimeZoneId(newMessage.date, "Central Standard Time");
-
             newMessage.type = "message";
 
             if ((newMessage.message != "") && (newMessage.receptor != ""))

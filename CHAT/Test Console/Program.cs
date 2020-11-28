@@ -15,6 +15,7 @@ namespace Test_Console
             //string cadena2 = Encoding.Unicode.GetString(arr);
 
             SDES _SDES = new SDES();
+
             _SDES.KeysGenerator("100101");
 
             //byte[] asda = _SDES.SDES_Encryption(arr, "cifrado");
@@ -113,6 +114,13 @@ namespace Test_Console
             //    buil.Append(charArray[i].ToString());
             //}
             //string result = buil.ToString();
+            //_SDES.KeysGenerator("10001000");
+            //byte[] textoOriginal = { 23, 84, 14, 199, 200, 80, 88, 99, 40, 40, 41, 24, 42, 3};
+            //byte[] textoCifrado = _SDES.SDES_Encryption(textoOriginal, "cifrado");
+            //byte[] textoDescifrado = _SDES.SDES_Encryption(textoCifrado, "descifrado");
+
+
+
             Console.ReadLine();
         }
     }
