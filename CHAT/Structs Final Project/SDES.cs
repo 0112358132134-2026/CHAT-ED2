@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 
 namespace Structs_Final_Project
@@ -270,6 +271,16 @@ namespace Structs_Final_Project
                 number = (int)(number / 2);
             }
             return result;
+        }
+        public string ToNBase(BigInteger a, int n)
+        {
+            StringBuilder sb = new StringBuilder();
+            while (a > 0)
+            {
+                sb.Insert(0, a % n);
+                a /= n;
+            }
+            return sb.ToString();
         }
         #endregion
     }

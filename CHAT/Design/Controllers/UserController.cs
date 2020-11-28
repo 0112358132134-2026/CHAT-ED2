@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Design.Models;
@@ -9,29 +8,45 @@ using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 using Structs_Final_Project;
 using System.IO;
+using System.Numerics;
+using System.Text;
+using Microsoft.AspNetCore.Hosting;
 
 namespace Design.Controllers
 {
     public class UserController : Controller
     {
-        // GET: User
+        private IWebHostEnvironment _env;
+        public UserController(IWebHostEnvironment env)
+        {
+            _env = env;
+        }
+
         public ActionResult Index()
         {
             return View();
         }
-
-        // GET: User/Details/5
         public ActionResult Details(int id)
         {
             return View();
         }
-
-        // GET: User/Create
         public ActionResult Create()
         {
             return View();
         }
 
+        public ActionResult LoginChat()
+        {
+            if (HttpContext.Session.GetString("nameAllUsers") != null)
+            {
+                ViewBag.AllUsers = JsonSerializer.Deserialize<string[]>(HttpContext.Session.GetString("nameAllUsers"));
+            }
+            if (HttpContext.Session.GetString("nameAllMessages") != null)
+            {
+                ViewBag.actualMessages = JsonSerializer.Deserialize<Message[]>(HttpContext.Session.GetString("nameAllMessages"));
+            }
+            return View("../Home/Main_Screen");
+        }
         [HttpPost]
         public async Task<ActionResult> Register(IFormCollection form)
         {
@@ -119,7 +134,6 @@ namespace Design.Controllers
                 }
             }
         }
-
         [HttpPost]
         public async Task<ActionResult> Login(IFormCollection form)
         {
@@ -186,24 +200,28 @@ namespace Design.Controllers
             }
         }
 
-        //Listo con actualización de combo box
+        //Listo creo
         [HttpPost]
         public async Task<ActionResult> SendMessage(IFormCollection form)
         {
+            string actualMessage = form["Message"];
+
             Message newMessage = new Message();
             User user = JsonSerializer.Deserialize<User>(HttpContext.Session.GetString("thisUser"));
 
-            //Nuevo
-            Message userAux = new Message();
-            userAux.receptor = form["ListUsers"];
+            Message userAux = new Message
+            {
+                receptor = form["ListUsers"]
+            };
             HttpContext.Session.SetString("thisR", JsonSerializer.Serialize(userAux));
-
 
             newMessage.emisor = user.UserName;
             newMessage.receptor = form["ListUsers"];
             newMessage.message = form["Message"];
             newMessage._id = Guid.NewGuid().ToString();
-            newMessage.date = DateTime.Now;
+            newMessage.date = DateTime.Today;
+            TimeZoneInfo.ConvertTimeBySystemTimeZoneId(newMessage.date, "Central Standard Time");
+
             newMessage.type = "message";
 
             if ((newMessage.message != "") && (newMessage.receptor != ""))
@@ -212,6 +230,61 @@ namespace Design.Controllers
                 {
                     client.BaseAddress = new Uri("http://localhost:62573/api/");
                     client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                    
+                    var postAllUsers = client.GetAsync("allUsers");
+                    postAllUsers.Wait();
+                    var fufu = postAllUsers.Result;
+                    string asdasda = await fufu.Content.ReadAsAsync<string>();
+                    User[] allUsersXD = JsonSerializer.Deserialize<User[]>(asdasda);
+
+                    User newUser1 = new User();
+                    User newUser2 = new User();
+                    for (int i = 0; i < allUsersXD.Length; i++)
+                    {
+                        if (allUsersXD[i].UserName == newMessage.emisor)
+                        {
+                            newUser1 = allUsersXD[i];
+                        }
+                        if (allUsersXD[i].UserName == newMessage.receptor)
+                        {
+                            newUser2 = allUsersXD[i];
+                        }
+                    }
+                    
+                    #region "Cifrado SDES"
+                    Diffie_Hellman _diffie = new Diffie_Hellman();
+                    BigInteger publicNumber1 = _diffie.PublicNumberGenerator(33, 101, newUser1.Private_Number);
+                    BigInteger publicNumber2 = _diffie.PublicNumberGenerator(33, 101, newUser2.Private_Number);
+                    BigInteger kuser1 = _diffie.KGenerator(publicNumber2, newUser1.Private_Number, 101);
+                    BigInteger kuser2 = _diffie.KGenerator(publicNumber1, newUser2.Private_Number, 101);
+
+                    string response = "";
+                    if (kuser1 == kuser2)
+                    {
+                        SDES _sdes = new SDES();
+                        string keyMaster = _sdes.ToNBase(kuser1, 2);
+                        _sdes.KeysGenerator(keyMaster);
+                        //Convertir mensaje a arreglo de bytes:
+                        char[] charrArray_OriginalText = actualMessage.ToCharArray();
+                        byte[] original_Bytes = new byte[charrArray_OriginalText.Length];
+                        for (int i = 0; i < charrArray_OriginalText.Length; i++)
+                        {
+                            original_Bytes[i] = (byte)charrArray_OriginalText[i];
+                        }
+                        byte[] resultFinalBytes = _sdes.SDES_Encryption(original_Bytes, "cifrado");
+                        //Convertir arreglo de bytes a string y agregarlo a Mongo:
+                        char[] charrArra_Result = new char[resultFinalBytes.Length];
+                        for (int i = 0; i < resultFinalBytes.Length; i++)
+                        {
+                            charrArra_Result[i] = (char)resultFinalBytes[i];
+                        }
+                        for (int i = 0; i < charrArra_Result.Length; i++)
+                        {
+                            response += charrArra_Result[i].ToString();
+                        }
+                    }
+                    newMessage.message = response;
+                    #endregion
 
                     var postTask = client.PostAsJsonAsync<Message>("addMessage", newMessage);
                     postTask.Wait();
@@ -235,6 +308,64 @@ namespace Design.Controllers
                             {
                                 if (((allMessages[i].emisor == newMessage.emisor) && (allMessages[i].receptor == newMessage.receptor)) || ((allMessages[i].receptor == newMessage.emisor) && (allMessages[i].emisor == newMessage.receptor)))
                                 {
+                                    if (allMessages[i].type == "message")
+                                    {
+                                        #region "Descifrado SDES"
+
+                                        var postAllUsers2 = client.GetAsync("allUsers");
+                                        postAllUsers2.Wait();
+                                        var fufufu = postAllUsers2.Result;
+                                        string asdasdasa = await fufufu.Content.ReadAsAsync<string>();
+                                        User[] allUsersXDD = JsonSerializer.Deserialize<User[]>(asdasdasa);
+
+                                        User newUser11 = new User();
+                                        User newUser22 = new User();
+                                        for (int j = 0; j < allUsersXDD.Length; j++)
+                                        {
+                                            if (allUsersXDD[j].UserName == newMessage.emisor)
+                                            {
+                                                newUser11 = allUsersXDD[j];
+                                            }
+                                            if (allUsersXDD[j].UserName == newMessage.receptor)
+                                            {
+                                                newUser22 = allUsersXDD[j];
+                                            }
+                                        }                                        
+
+                                        Diffie_Hellman _diffie1 = new Diffie_Hellman();
+                                        BigInteger publicNumber11 = _diffie1.PublicNumberGenerator(33, 101, newUser11.Private_Number);
+                                        BigInteger publicNumber22 = _diffie1.PublicNumberGenerator(33, 101, newUser22.Private_Number);
+                                        BigInteger kuser11 = _diffie1.KGenerator(publicNumber22, newUser11.Private_Number, 101);
+                                        BigInteger kuser22 = _diffie1.KGenerator(publicNumber11, newUser22.Private_Number, 101);
+
+                                        string response2 = "";
+                                        if (kuser11 == kuser22)
+                                        {
+                                            SDES _sdes = new SDES();
+                                            string keyMaster = _sdes.ToNBase(kuser11, 2);
+                                            _sdes.KeysGenerator(keyMaster);
+                                            //Convertir mensaje a arreglo de bytes:
+                                            char[] arrayChar = allMessages[i].message.ToCharArray();
+                                            byte[] bytes_Encrypted = new byte[arrayChar.Length];
+                                            for (int j = 0; j < arrayChar.Length; j++)
+                                            {
+                                                bytes_Encrypted[j] = (byte)arrayChar[j];
+                                            }
+                                            byte[] resultFinalBytes = _sdes.SDES_Encryption(bytes_Encrypted, "descifrado");
+                                            //Convertir arreglo de bytes a string y agregarlo a Mongo:
+                                            char[] charResult = new char[resultFinalBytes.Length];
+                                            for (int j = 0; j < resultFinalBytes.Length; j++)
+                                            {
+                                                charResult[j] = (char)resultFinalBytes[j];
+                                            }
+                                            for (int j = 0; j < charResult.Length; j++)
+                                            {
+                                                response2 += charResult[j].ToString();
+                                            }
+                                        }
+                                        allMessages[i].message = response2;
+                                        #endregion
+                                    }
                                     allMessagesAux.Add(allMessages[i]);
                                 }
                             }
@@ -305,6 +436,64 @@ namespace Design.Controllers
                         {
                             if (((allMessages[i].emisor == newMessage.emisor) && (allMessages[i].receptor == newMessage.receptor)) || ((allMessages[i].receptor == newMessage.emisor) && (allMessages[i].emisor == newMessage.receptor)))
                             {
+                                if (allMessages[i].type == "message")
+                                {
+                                    #region "Descifrado SDES"
+
+                                    var postAllUsers2 = client.GetAsync("allUsers");
+                                    postAllUsers2.Wait();
+                                    var fufufu = postAllUsers2.Result;
+                                    string asdasdasa = await fufufu.Content.ReadAsAsync<string>();
+                                    User[] allUsersXDD = JsonSerializer.Deserialize<User[]>(asdasdasa);
+
+                                    User newUser11 = new User();
+                                    User newUser22 = new User();
+                                    for (int j = 0; j < allUsersXDD.Length; j++)
+                                    {
+                                        if (allUsersXDD[j].UserName == newMessage.emisor)
+                                        {
+                                            newUser11 = allUsersXDD[j];
+                                        }
+                                        if (allUsersXDD[j].UserName == newMessage.receptor)
+                                        {
+                                            newUser22 = allUsersXDD[j];
+                                        }
+                                    }
+
+                                    Diffie_Hellman _diffie1 = new Diffie_Hellman();
+                                    BigInteger publicNumber11 = _diffie1.PublicNumberGenerator(33, 101, newUser11.Private_Number);
+                                    BigInteger publicNumber22 = _diffie1.PublicNumberGenerator(33, 101, newUser22.Private_Number);
+                                    BigInteger kuser11 = _diffie1.KGenerator(publicNumber22, newUser11.Private_Number, 101);
+                                    BigInteger kuser22 = _diffie1.KGenerator(publicNumber11, newUser22.Private_Number, 101);
+
+                                    string response2 = "";
+                                    if (kuser11 == kuser22)
+                                    {
+                                        SDES _sdes = new SDES();
+                                        string keyMaster = _sdes.ToNBase(kuser11, 2);
+                                        _sdes.KeysGenerator(keyMaster);
+                                        //Convertir mensaje a arreglo de bytes:
+                                        char[] arrayChar = allMessages[i].message.ToCharArray();
+                                        byte[] bytes_Encrypted = new byte[arrayChar.Length];
+                                        for (int j = 0; j < arrayChar.Length; j++)
+                                        {
+                                            bytes_Encrypted[j] = (byte)arrayChar[j];
+                                        }
+                                        byte[] resultFinalBytes = _sdes.SDES_Encryption(bytes_Encrypted, "descifrado");
+                                        //Convertir arreglo de bytes a string y agregarlo a Mongo:
+                                        char[] charResult = new char[resultFinalBytes.Length];
+                                        for (int j = 0; j < resultFinalBytes.Length; j++)
+                                        {
+                                            charResult[j] = (char)resultFinalBytes[j];
+                                        }
+                                        for (int j = 0; j < charResult.Length; j++)
+                                        {
+                                            response2 += charResult[j].ToString();
+                                        }
+                                    }
+                                    allMessages[i].message = response2;
+                                    #endregion
+                                }
                                 allMessagesAux.Add(allMessages[i]);
                             }
                         }
@@ -349,20 +538,7 @@ namespace Design.Controllers
             return Ok();
         }
 
-        public ActionResult LoginChat()
-        {
-            if (HttpContext.Session.GetString("nameAllUsers") != null)
-            {
-                ViewBag.AllUsers = JsonSerializer.Deserialize<string[]>(HttpContext.Session.GetString("nameAllUsers"));
-            }
-            if (HttpContext.Session.GetString("nameAllMessages") != null)
-            {
-                ViewBag.actualMessages = JsonSerializer.Deserialize<Message[]>(HttpContext.Session.GetString("nameAllMessages"));
-            }
-            return View("../Home/Main_Screen");
-        }
-
-        //Listo con actualización de combo box
+        //Listo creo (falta LZW)
         [HttpPost]
         public async Task<ActionResult> Archive(IFormFile file, IFormCollection form)
         {
@@ -387,19 +563,35 @@ namespace Design.Controllers
 
                 if (result.IsSuccessStatusCode)
                 {
+                    #region "LZW Compression"
+                    LZW _lzw = new LZW();
+                    byte[] resultArchive = null;
                     byte[] originalByte = null;
+                   
                     using (var memory = new MemoryStream())
                     {
                         await file.CopyToAsync(memory);
                         originalByte = memory.ToArray();
+                        //nuevo
+                        using (FileStream fstream = System.IO.File.Create(_env.ContentRootPath + "/Copy/" + file.FileName))
+                        {
+                            fstream.Write(memory.ToArray());
+                            fstream.Close();
+                        }
+                        resultArchive = _lzw.Compression(_env.ContentRootPath + "/Copy/" + file.FileName, file.FileName);
                     }
-                    Archive archive = new Archive();
-                    archive._id = message._id;
-                    archive.message = originalByte;
+                    System.IO.File.Delete(_env.ContentRootPath + "/Copy/" + file.FileName);
+                    #endregion
+
+                    Archive archive = new Archive
+                    {
+                        _id = message._id,
+                        message = resultArchive,
+                        name = file.FileName
+                    };
 
                     var postTaskAux = client.PostAsJsonAsync<Archive>("addArchive", archive);
-                    postTaskAux.Wait();
-                    //
+                    postTaskAux.Wait();                    
 
                     var postTask2 = client.GetAsync("allMessages");
                     postTask2.Wait();
@@ -416,6 +608,64 @@ namespace Design.Controllers
                         {
                             if (((allMessages[i].emisor == message.emisor) && (allMessages[i].receptor == message.receptor)) || ((allMessages[i].receptor == message.emisor) && (allMessages[i].emisor == message.receptor)))
                             {
+                                if (allMessages[i].type == "message")
+                                {
+                                    #region "Descifrado SDES"
+
+                                    var postAllUsers2 = client.GetAsync("allUsers");
+                                    postAllUsers2.Wait();
+                                    var fufufu = postAllUsers2.Result;
+                                    string asdasdasa = await fufufu.Content.ReadAsAsync<string>();
+                                    User[] allUsersXDD = JsonSerializer.Deserialize<User[]>(asdasdasa);
+
+                                    User newUser11 = new User();
+                                    User newUser22 = new User();
+                                    for (int j = 0; j < allUsersXDD.Length; j++)
+                                    {
+                                        if (allUsersXDD[j].UserName == userAux.UserName)
+                                        {
+                                            newUser11 = allUsersXDD[j];
+                                        }
+                                        if (allUsersXDD[j].UserName == form["receptor"])
+                                        {
+                                            newUser22 = allUsersXDD[j];
+                                        }
+                                    }
+
+                                    Diffie_Hellman _diffie1 = new Diffie_Hellman();
+                                    BigInteger publicNumber11 = _diffie1.PublicNumberGenerator(33, 101, newUser11.Private_Number);
+                                    BigInteger publicNumber22 = _diffie1.PublicNumberGenerator(33, 101, newUser22.Private_Number);
+                                    BigInteger kuser11 = _diffie1.KGenerator(publicNumber22, newUser11.Private_Number, 101);
+                                    BigInteger kuser22 = _diffie1.KGenerator(publicNumber11, newUser22.Private_Number, 101);
+
+                                    string response2 = "";
+                                    if (kuser11 == kuser22)
+                                    {
+                                        SDES _sdes = new SDES();
+                                        string keyMaster = _sdes.ToNBase(kuser11, 2);
+                                        _sdes.KeysGenerator(keyMaster);
+                                        //Convertir mensaje a arreglo de bytes:
+                                        char[] arrayChar = allMessages[i].message.ToCharArray();
+                                        byte[] bytes_Encrypted = new byte[arrayChar.Length];
+                                        for (int j = 0; j < arrayChar.Length; j++)
+                                        {
+                                            bytes_Encrypted[j] = (byte)arrayChar[j];
+                                        }
+                                        byte[] resultFinalBytes = _sdes.SDES_Encryption(bytes_Encrypted, "descifrado");
+                                        //Convertir arreglo de bytes a string y agregarlo a Mongo:
+                                        char[] charResult = new char[resultFinalBytes.Length];
+                                        for (int j = 0; j < resultFinalBytes.Length; j++)
+                                        {
+                                            charResult[j] = (char)resultFinalBytes[j];
+                                        }
+                                        for (int j = 0; j < charResult.Length; j++)
+                                        {
+                                            response2 += charResult[j].ToString();
+                                        }
+                                    }
+                                    allMessages[i].message = response2;
+                                    #endregion
+                                }
                                 allMessagesAux.Add(allMessages[i]);
                             }
                         }
@@ -464,6 +714,7 @@ namespace Design.Controllers
             return StatusCode(500);
         }
 
+        //Falta LZW
         [HttpGet]
         public async Task<ActionResult> DownloadFile(string id)
         {
@@ -483,8 +734,23 @@ namespace Design.Controllers
                 if (result.IsSuccessStatusCode)
                 {
                     string stringAux = await result.Content.ReadAsAsync<string>();
-                    Archive allMessages = JsonSerializer.Deserialize<Archive>(stringAux);
-                    return File(allMessages.message, "text/plain", "resultado.txt");
+                    Archive allMessages = JsonSerializer.Deserialize<Archive>(stringAux);                                        
+
+                    #region "LZW Decompression"
+                    LZW _lzw = new LZW();
+                    
+                    using (FileStream fstream = System.IO.File.Create(_env.ContentRootPath + "/Copy2/" + allMessages.name))
+                    {
+                        fstream.Write(allMessages.message);
+                        fstream.Close();
+                    }
+                    string originalName = _lzw.GetOriginalName(_env.ContentRootPath + "/Copy2/" + allMessages.name);
+                    byte[] resultArchive = _lzw.Decompression(_env.ContentRootPath + "/Copy2/" + allMessages.name);                    
+                    
+                    System.IO.File.Delete(_env.ContentRootPath + "/Copy2/" + allMessages.name);
+                    #endregion
+
+                    return File(resultArchive, "text/plain", originalName);
                 }
                 else
                 {
@@ -498,15 +764,85 @@ namespace Design.Controllers
         {
             string messageToSearch = form["MessageToSearch"];
             string receptor = form["receptor"];
+            Message mmmm = JsonSerializer.Deserialize<Message>(HttpContext.Session.GetString("thisR"));
 
             Message messageAux = new Message();
-            messageAux.message = messageToSearch;
             User userAux = JsonSerializer.Deserialize<User>(HttpContext.Session.GetString("thisUser"));
 
             using (var client = new HttpClient())
             {
                 client.BaseAddress = new Uri("http://localhost:62573/api/");
                 client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+
+                //Cifrar mensaje
+                var postAllUsers = client.GetAsync("allUsers");
+                postAllUsers.Wait();
+                var fufu = postAllUsers.Result;
+                string asdasda = await fufu.Content.ReadAsAsync<string>();
+                User[] allUsersXD = JsonSerializer.Deserialize<User[]>(asdasda);
+
+                User newUser1 = new User();
+                User newUser2 = new User();
+                for (int i = 0; i < allUsersXD.Length; i++)
+                {
+                    if (userAux.UserName != form["receptor"])
+                    {
+                        if (allUsersXD[i].UserName == userAux.UserName)
+                        {
+                            newUser1 = allUsersXD[i];
+                        }
+                        if (allUsersXD[i].UserName == form["receptor"])
+                        {
+                            newUser2 = allUsersXD[i];
+                        }
+                    }
+                    else
+                    {
+                        if (allUsersXD[i].UserName == mmmm.receptor)
+                        {
+                            newUser1 = allUsersXD[i];
+                        }
+                        if (allUsersXD[i].UserName == form["receptor"])
+                        {
+                            newUser2 = allUsersXD[i];
+                        }
+                    }                   
+                }
+
+                #region "Cifrado SDES"
+                Diffie_Hellman _diffie = new Diffie_Hellman();
+                BigInteger publicNumber1 = _diffie.PublicNumberGenerator(33, 101, newUser1.Private_Number);
+                BigInteger publicNumber2 = _diffie.PublicNumberGenerator(33, 101, newUser2.Private_Number);
+                BigInteger kuser1 = _diffie.KGenerator(publicNumber2, newUser1.Private_Number, 101);
+                BigInteger kuser2 = _diffie.KGenerator(publicNumber1, newUser2.Private_Number, 101);
+
+                string response = "";
+                if (kuser1 == kuser2)
+                {
+                    SDES _sdes = new SDES();
+                    string keyMaster = _sdes.ToNBase(kuser1, 2);
+                    _sdes.KeysGenerator(keyMaster);
+                    //Convertir mensaje a arreglo de bytes:
+                    char[] charrArray_OriginalText = messageToSearch.ToCharArray();
+                    byte[] original_Bytes = new byte[charrArray_OriginalText.Length];
+                    for (int i = 0; i < charrArray_OriginalText.Length; i++)
+                    {
+                        original_Bytes[i] = (byte)charrArray_OriginalText[i];
+                    }
+                    byte[] resultFinalBytes = _sdes.SDES_Encryption(original_Bytes, "cifrado");
+                    //Convertir arreglo de bytes a string y agregarlo a Mongo:
+                    char[] charrArra_Result = new char[resultFinalBytes.Length];
+                    for (int i = 0; i < resultFinalBytes.Length; i++)
+                    {
+                        charrArra_Result[i] = (char)resultFinalBytes[i];
+                    }
+                    for (int i = 0; i < charrArra_Result.Length; i++)
+                    {
+                        response += charrArra_Result[i].ToString();
+                    }
+                }
+                messageAux.message = response;
+                #endregion
 
                 var postTask = client.PostAsJsonAsync<Message>("searchMessages", messageAux);
                 postTask.Wait();
@@ -519,11 +855,90 @@ namespace Design.Controllers
                     string resultAux = await result.Content.ReadAsAsync<string>();
                     Message[] allMessages = JsonSerializer.Deserialize<Message[]>(resultAux);
                     List<Message> allMessagesAux = new List<Message>();
+                    
 
+                    
                     for (int i = 0; i < allMessages.Length; i++)
                     {
-                        if (((allMessages[i].emisor == userAux.UserName) && (allMessages[i].receptor == receptor)) || ((allMessages[i].receptor == userAux.UserName) && (allMessages[i].emisor == receptor)))
+                        bool oka = false;
+                        if (((allMessages[i].emisor == mmmm.receptor) && (allMessages[i].receptor == receptor)) || ((allMessages[i].receptor == mmmm.receptor) && (allMessages[i].emisor == receptor)))
                         {
+                            oka = true;
+                        }
+                        if (((allMessages[i].emisor == userAux.UserName) && (allMessages[i].receptor == receptor)) || ((allMessages[i].receptor == userAux.UserName) && (allMessages[i].emisor == receptor)) || oka)
+                        {
+                            if (allMessages[i].type == "message")
+                            {
+                                #region "Descifrado SDES"
+
+                                var postAllUsers2 = client.GetAsync("allUsers");
+                                postAllUsers2.Wait();
+                                var fufufu = postAllUsers2.Result;
+                                string asdasdasa = await fufufu.Content.ReadAsAsync<string>();
+                                User[] allUsersXDD = JsonSerializer.Deserialize<User[]>(asdasdasa);
+
+                                User newUser11 = new User();
+                                User newUser22 = new User();
+                                for (int j = 0; j < allUsersXDD.Length; j++)
+                                {
+                                    if (userAux.UserName != form["receptor"])
+                                    {
+                                        if (allUsersXDD[j].UserName == userAux.UserName)
+                                        {
+                                            newUser11 = allUsersXDD[j];
+                                        }
+                                        if (allUsersXDD[j].UserName == receptor)
+                                        {
+                                            newUser22 = allUsersXDD[j];
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (allUsersXD[j].UserName == mmmm.receptor)
+                                        {
+                                            newUser11 = allUsersXD[j];
+                                        }
+                                        if (allUsersXD[j].UserName == form["receptor"])
+                                        {
+                                            newUser22 = allUsersXD[j];
+                                        }
+                                    }
+                                }
+
+                                Diffie_Hellman _diffie1 = new Diffie_Hellman();
+                                BigInteger publicNumber11 = _diffie1.PublicNumberGenerator(33, 101, newUser11.Private_Number);
+                                BigInteger publicNumber22 = _diffie1.PublicNumberGenerator(33, 101, newUser22.Private_Number);
+                                BigInteger kuser11 = _diffie1.KGenerator(publicNumber22, newUser11.Private_Number, 101);
+                                BigInteger kuser22 = _diffie1.KGenerator(publicNumber11, newUser22.Private_Number, 101);
+
+                                string response2 = "";
+                                if (kuser11 == kuser22)
+                                {
+                                    SDES _sdes = new SDES();
+                                    string keyMaster = _sdes.ToNBase(kuser11, 2);
+                                    _sdes.KeysGenerator(keyMaster);
+                                    //Convertir mensaje a arreglo de bytes:
+                                    char[] arrayChar = allMessages[i].message.ToCharArray();
+                                    byte[] bytes_Encrypted = new byte[arrayChar.Length];
+                                    for (int j = 0; j < arrayChar.Length; j++)
+                                    {
+                                        bytes_Encrypted[j] = (byte)arrayChar[j];
+                                    }
+                                    byte[] resultFinalBytes = _sdes.SDES_Encryption(bytes_Encrypted, "descifrado");
+                                    //Convertir arreglo de bytes a string y agregarlo a Mongo:
+                                    char[] charResult = new char[resultFinalBytes.Length];
+                                    for (int j = 0; j < resultFinalBytes.Length; j++)
+                                    {
+                                        charResult[j] = (char)resultFinalBytes[j];
+                                    }
+                                    for (int j = 0; j < charResult.Length; j++)
+                                    {
+                                        response2 += charResult[j].ToString();
+                                    }
+                                }
+                                allMessages[i].message = response2;
+                                #endregion
+                            }
                             allMessagesAux.Add(allMessages[i]);
                         }
                     }

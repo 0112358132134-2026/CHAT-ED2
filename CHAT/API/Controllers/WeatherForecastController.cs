@@ -160,7 +160,7 @@ namespace API.Controllers
             MongoClient newClient = new MongoClient("mongodb://localhost:27017");
             var db = newClient.GetDatabase("chat");
             var collection = db.GetCollection<BsonDocument>("records");
-            var message = new BsonDocument { { "_id", archive._id }, { "message", archive.message }};
+            var message = new BsonDocument { { "_id", archive._id }, { "message", archive.message }, { "name", archive.name} };
             collection.InsertOne(message);
             return Ok();
         }

@@ -15,11 +15,11 @@
 <br>
 <br />
 
+
 <div class="text-center">
-    <h4>Hello, @user.UserName, you are in your private chat </h4>
+    <h4>Hello, @user.UserName, you are in your private chat</h4>
 </div>
-
-
+   
 <div class="text-center">
 
     <form asp-action="SendMessage" asp-controller="User">
@@ -118,16 +118,19 @@
 <div class="text-center">
     <form method="post" enctype="multipart/form-data" asp-controller="User" asp-action="Archive">
 
-        <div class="form-group">
-            <table>
-                <tr>
-                    <td><input type="text" name="receptor" placeholder="User..." /></td>
-                    <td></td>
-                    <td><input type="file" name="file" /><input type="image" value="Add File" class="btn-outline-warning" src="~/Imágenes/Archivos.png" /></td>
-                </tr>
-            </table>
-        </div>
+        <font color="white">
 
+            <div class="form-group">
+                <table border="1">
+                    <tr>
+                        <td><input type="text" name="receptor" placeholder="User..." /></td>
+                        <td></td>
+                        <td><input type="file" name="file" /><input type="image" value="Add File" class="btn-outline-warning" src="~/Imágenes/Archivos.png" /></td>
+                    </tr>
+                </table>
+            </div>
+
+        </font>            
     </form>
 </div>
 

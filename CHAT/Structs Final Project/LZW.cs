@@ -26,63 +26,71 @@ namespace Structs_Final_Project
         public void OriginalTable(string path)
         {
             int counter = 0;
-            FileStream fs = File.OpenRead(path);
-            BinaryReader reader = new BinaryReader(fs);
-
-            while (fs.Length - (8 * counter) > 0)
+            
+            using (FileStream fs = File.OpenRead(path))
             {
-                byte[] buffer = reader.ReadBytes(8);
-                for (int i = 0; i < buffer.Length; i++)
+                using (BinaryReader reader = new BinaryReader(fs))
                 {
-                    if (!symbols.ContainsKey(((char)buffer[i]).ToString()))
+                    while (fs.Length - (8 * counter) > 0)
                     {
-                        char character = (char)buffer[i];
-                        symbols.Add(character.ToString(), index);
-                        index++;
+                        byte[] buffer = reader.ReadBytes(8);
+                        for (int i = 0; i < buffer.Length; i++)
+                        {
+                            if (!symbols.ContainsKey(((char)buffer[i]).ToString()))
+                            {
+                                char character = (char)buffer[i];
+                                symbols.Add(character.ToString(), index);
+                                index++;
+                            }
+                        }
+                        counter++;
                     }
+                    posOriginalData = index - 1;
                 }
-                counter++;
-            }
-            posOriginalData = index - 1;
+            }                       
         }
         public void TextInNumbers(string path)
         {
             int counter = 0;
-            FileStream fs = File.OpenRead(path);
-            BinaryReader reader = new BinaryReader(fs);
 
-            StringBuilder longesChain = new StringBuilder();
-            StringBuilder longesChainPlusOne = new StringBuilder();
-
-            while (fs.Length - (8 * counter) > 0)
+            using (FileStream fs = File.OpenRead(path))
             {
-                byte[] buffer = reader.ReadBytes(8);
-                int counterTwo = 0;
-
-                while (counterTwo < buffer.Length)
+                using (BinaryReader reader = new BinaryReader(fs))
                 {
-                    longesChainPlusOne.Append(((char)buffer[counterTwo]).ToString());
-                    if (!symbols.ContainsKey(longesChainPlusOne.ToString()))
+                    StringBuilder longesChain = new StringBuilder();
+                    StringBuilder longesChainPlusOne = new StringBuilder();
+
+                    while (fs.Length - (8 * counter) > 0)
+                    {
+                        byte[] buffer = reader.ReadBytes(8);
+                        int counterTwo = 0;
+
+                        while (counterTwo < buffer.Length)
+                        {
+                            longesChainPlusOne.Append(((char)buffer[counterTwo]).ToString());
+                            if (!symbols.ContainsKey(longesChainPlusOne.ToString()))
+                            {
+                                textInNumbers.Add(symbols[longesChain.ToString()]);
+                                symbols.Add(longesChainPlusOne.ToString(), index);
+                                index++;
+                                longesChainPlusOne.Clear();
+                                longesChain.Clear();
+                                counterTwo -= 1;
+                            }
+                            else
+                            {
+                                longesChain.Append(((char)buffer[counterTwo]).ToString());
+                            }
+                            counterTwo++;
+                        }
+                        counter++;
+                    }
+                    if (longesChain.Length > 0)
                     {
                         textInNumbers.Add(symbols[longesChain.ToString()]);
-                        symbols.Add(longesChainPlusOne.ToString(), index);
-                        index++;
-                        longesChainPlusOne.Clear();
-                        longesChain.Clear();
-                        counterTwo -= 1;
                     }
-                    else
-                    {
-                        longesChain.Append(((char)buffer[counterTwo]).ToString());
-                    }
-                    counterTwo++;
                 }
-                counter++;
-            }
-            if (longesChain.Length > 0)
-            {
-                textInNumbers.Add(symbols[longesChain.ToString()]);
-            }
+            }                                   
         }
         public byte[] CompressedText(int maxValue, string originalName)
         {
@@ -181,79 +189,88 @@ namespace Structs_Final_Project
             int metaDataLength = GetOriginalName(path).Length + 2;
             int numberOfCharacters = 0;
 
-            FileStream fs = File.OpenRead(path);
-            BinaryReader reader = new BinaryReader(fs);
-
-            bool matchNumberOfCharacters = false;
-            int counter = 0;
-
-            while (!matchNumberOfCharacters)
+            using (FileStream fs = File.OpenRead(path))
             {
-                byte[] buffer = reader.ReadBytes(8);
-                for (int i = 0; i < buffer.Length; i++)
+                using (BinaryReader reader = new BinaryReader(fs))
                 {
-                    if (counter == metaDataLength)
+                    bool matchNumberOfCharacters = false;
+                    int counterAux = 0;
+
+                    while (!matchNumberOfCharacters)
                     {
-                        numberOfCharacters = buffer[i];
-                        matchNumberOfCharacters = true;
-                    }
-                    counter++;
-                }
-            }
-
-            FileStream fs1 = File.OpenRead(path);
-            BinaryReader reader1 = new BinaryReader(fs1);
-
-            bool allInserted = false;
-            counter = 0;
-
-            while (!allInserted)
-            {
-                byte[] buffer = reader1.ReadBytes(8);
-                for (int i = 0; i < buffer.Length; i++)
-                {
-                    if ((counter >= metaDataLength + 1) && (index <= numberOfCharacters))
-                    {
-                        char character = (char)buffer[i];
-                        symbolsAux.Add(index, character.ToString());
-                        index++;
-                    }
-                    counter++;
-                }
-                if (index == numberOfCharacters + 1)
-                {
-                    allInserted = true;
-                }
-            }
-        }
-        public string GetOriginalName(string path)
-        {
-            FileStream fs = File.OpenRead(path);
-            BinaryReader reader = new BinaryReader(fs);
-
-            StringBuilder result = new StringBuilder();
-            bool matchTen = false;
-
-            while (!matchTen)
-            {
-                byte[] buffer = reader.ReadBytes(8);
-                for (int i = 0; i < buffer.Length; i++)
-                {
-                    if (buffer[i] == 10)
-                    {
-                        matchTen = true;
-                    }
-                    else
-                    {
-                        if (!matchTen)
+                        byte[] buffer = reader.ReadBytes(8);
+                        for (int i = 0; i < buffer.Length; i++)
                         {
-                            char aux = (char)buffer[i];
-                            result.Append(aux.ToString());
+                            if (counterAux == metaDataLength)
+                            {
+                                numberOfCharacters = buffer[i];
+                                matchNumberOfCharacters = true;
+                            }
+                            counterAux++;
                         }
                     }
                 }
             }
-            return result.ToString();
+
+            using (FileStream fs1 = File.OpenRead(path))
+            {
+                using (BinaryReader reader1 = new BinaryReader(fs1))
+                {
+                    bool allInserted = false;
+                    int counter = 0;
+
+                    while (!allInserted)
+                    {
+                        byte[] buffer = reader1.ReadBytes(8);
+                        for (int i = 0; i < buffer.Length; i++)
+                        {
+                            if ((counter >= metaDataLength + 1) && (index <= numberOfCharacters))
+                            {
+                                char character = (char)buffer[i];
+                                symbolsAux.Add(index, character.ToString());
+                                index++;
+                            }
+                            counter++;
+                        }
+                        if (index == numberOfCharacters + 1)
+                        {
+                            allInserted = true;
+                        }
+                    }
+                }
+            }                                    
+        }
+        public string GetOriginalName(string path)
+        {
+            using (FileStream fs = File.OpenRead(path))
+            {
+                using (BinaryReader reader = new BinaryReader(fs))
+                {
+                    StringBuilder result = new StringBuilder();
+                    bool matchTen = false;
+
+                    while (!matchTen)
+                    {
+                        byte[] buffer = reader.ReadBytes(8);
+                        for (int i = 0; i < buffer.Length; i++)
+                        {
+                            if (buffer[i] == 10)
+                            {
+                                matchTen = true;
+                            }
+                            else
+                            {
+                                if (!matchTen)
+                                {
+                                    char aux = (char)buffer[i];
+                                    result.Append(aux.ToString());
+                                }
+                            }
+                        }
+                    }
+                    return result.ToString();
+                }
+            }                                   
         }
         public byte[] GetOriginalText(string path)
         {
@@ -318,23 +335,26 @@ namespace Structs_Final_Project
             int counterAux = 0;
             int metaDataLength = GetOriginalName(path).Length + 3 + symbolsAux.Count;
 
-            FileStream fs = File.OpenRead(path);
-            BinaryReader reader = new BinaryReader(fs);
-
-            while (fs.Length - (8 * counter) > 0)
+            using (FileStream fs = File.OpenRead(path))
             {
-                byte[] buffer = reader.ReadBytes(8);
-
-                for (int i = 0; i < buffer.Length; i++)
+                using (BinaryReader reader = new BinaryReader(fs))
                 {
-                    if (counterAux >= metaDataLength)
+                    while (fs.Length - (8 * counter) > 0)
                     {
-                        textInNumbers.Add(buffer[i]);
+                        byte[] buffer = reader.ReadBytes(8);
+
+                        for (int i = 0; i < buffer.Length; i++)
+                        {
+                            if (counterAux >= metaDataLength)
+                            {
+                                textInNumbers.Add(buffer[i]);
+                            }
+                            counterAux++;
+                        }
+                        counter++;
                     }
-                    counterAux++;
                 }
-                counter++;
-            }
+            }                                   
         }
         public void GetNFCT(string path)
         {
@@ -366,27 +386,30 @@ namespace Structs_Final_Project
             int metaDataLength = GetOriginalName(path).Length + 1;
             int result = 0;
 
-            FileStream fs = File.OpenRead(path);
-            BinaryReader reader = new BinaryReader(fs);
-
-            bool matchNumberOfBits = false;
-            int counter = 0;
-
-            while (!matchNumberOfBits)
+            using (FileStream fs = File.OpenRead(path))
             {
-                byte[] buffer = reader.ReadBytes(8);
-                for (int i = 0; i < buffer.Length; i++)
+                using (BinaryReader reader = new BinaryReader(fs))
                 {
-                    if (counter == metaDataLength)
-                    {
-                        result = buffer[i];
-                        matchNumberOfBits = true;
-                    }
-                    counter++;
-                }
-            }
+                    bool matchNumberOfBits = false;
+                    int counter = 0;
 
-            return result;
+                    while (!matchNumberOfBits)
+                    {
+                        byte[] buffer = reader.ReadBytes(8);
+                        for (int i = 0; i < buffer.Length; i++)
+                        {
+                            if (counter == metaDataLength)
+                            {
+                                result = buffer[i];
+                                matchNumberOfBits = true;
+                            }
+                            counter++;
+                        }
+                    }
+
+                    return result;
+                }
+            }                                  
         }
         #endregion
         #region "Auxiliaries"
